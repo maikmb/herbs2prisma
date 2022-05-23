@@ -321,35 +321,35 @@ More about: https://en.wikipedia.org/wiki/Object%E2%80%93relational_impedance_mi
 - [ ] Allow to ommit schema's name
 
 Features:
-- [X] Be able to change the conventions (injection)
+- [ ] Be able to change the conventions (injection)
 - [ ] Exclude / ignore fields on a sql statement
 - [ ] Awareness of created/updated at/by fields
-- [X] Plug-and-play knex
+- [ ] Plug-and-play knex
 - [ ] Easy access knex structure
 
 Retrieving and Persist:
-- [X] insert
+- [ ] insert
     - [ ] batchs
-- [X] update
+- [ ] update
     - [ ] batchs
-- [X] delete
+- [ ] delete
 - [ ] persist (upsert)
-- [X] find (ID)
+- [ ] find (ID)
     - [ ] deal with entities / tables with multiples IDs
-- [X] find by (any field)
+- [ ] find by (any field)
     - [ ] deal with entities / tables with multiples IDs
-    - [X] order by
-- [X] find All
-    - [X] order by
-- [X] find with pages
-- [X] first
+    - [ ] order by
+- [ ] find All
+    - [ ] order by
+- [ ] find with pages
+- [ ] first
 - [ ] last
 
 Tests:
-- [X] Pure JS
-- [X] Postgress
-- [X] Sql Server
-- [X] MySQL
+- [ ] Pure JS
+- [ ] Postgress
+- [ ] Sql Server
+- [ ] MySQL
 
 ### Contribute
 
