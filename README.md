@@ -3,7 +3,7 @@
 
 # herbs2prisma
 
-herbs2prisma creates repositories to retrieve and store [Entities](https://github.com/herbsjs/gotu) using [Knex](http://knexjs.org).
+herbs2prisma creates repositories to retrieve and store [Entities](https://github.com/herbsjs/gotu) using [Prisma](http://knexjs.org).
 
 ### Installing
 ```
@@ -12,11 +12,13 @@ herbs2prisma creates repositories to retrieve and store [Entities](https://githu
 
 ### Using
 
-`connection.js` - Knex initialization:
+`connection.js` - Prisma initialization:
 ```javascript
-const knex = require('knex')
-const config = require('./config')
-module.exports = knex(config)
+const { PrismaClient } = require('@prisma/client')
+
+module.exports = new PrismaClient({
+    // log: ['query', 'info'],
+})
 ```
 
 `itemRepository.js`:
@@ -57,19 +59,19 @@ In order to boost productivity Herbs2prisma provides way to dynamically generate
 
 These metadata are necessary to close the gap between OOP concepts and paradigms and those of relational databases. For example, it is necessary to specify primary keys and foreign keys as these information do not exist in the description of your domain.
 
-Following Herbs architecture principals it is not the intention of this lib to create yet another ORM or query builder but to create a bridge between your domain and an existing one (Knex).
+Following Herbs architecture principals it is not the intention of this lib to create yet another ORM or query builder but to create a bridge between your domain and an existing one (Prisma).
 
 ### Why Prisma?
 
 Herbs2prisma is just one of many bridges possible between Herbs and other packages.
 
-The advantage of using Knex is that is a simple and flexible SQL query builder. It also supports Postgres, MSSQL, MySQL, MariaDB, SQLite3, Oracle, and Amazon Redshift. So you can build your system using these databases out of the box.
+The advantage of using Prisma is that is a simple and flexible SQL query builder. It also supports Postgres, MSSQL, MySQL, MariaDB, SQLite3, Oracle, and Amazon Redshift. So you can build your system using these databases out of the box.
 
 ### Repository setup
 
 ```javascript
 const { Repository } = require('@herbsjs/herbs2prisma')
-const connection = require('connection')  // Knex initialize instance
+const connection = require('connection')  // Prisma initialize instance
 const { ProductItem } = require('../domain/entities/productItem')
 
 class YourRepository extends Repository {
@@ -132,9 +134,9 @@ class YourRepository extends Repository {
 
     The field names will converted to a database names using conventions. Ex: `customer_id`
 
-- `knex` - Knex initialize instance
+- `prisma` - Prisma initialize instance
     
-    Check Knex [documentation](http://knexjs.org/#Installation-client)
+    Check Prisma [documentation](https://www.prisma.io/)
 
 ## Retrieving and Persisting Data
 
@@ -324,8 +326,8 @@ Features:
 - [ ] Be able to change the conventions (injection)
 - [ ] Exclude / ignore fields on a sql statement
 - [ ] Awareness of created/updated at/by fields
-- [ ] Plug-and-play knex
-- [ ] Easy access knex structure
+- [ ] Plug-and-play prisma
+- [ ] Easy access prisma structure
 
 Retrieving and Persist:
 - [ ] insert
