@@ -31,7 +31,7 @@ class ItemRepository extends Repository {
             entity: Item,
             table: 'aTable',
             ids: ['id'],
-            knex: connection
+            prisma: connection
         })
     }
 
@@ -80,7 +80,7 @@ class YourRepository extends Repository {
             table: 'product_items',
             ids: ['id'],
             foreignKeys: [{ customerId: String }],
-            knex: connection
+            prisma: connection
         })
     }
 }
@@ -274,7 +274,7 @@ const userRepository = new UserRepository({
     table,
     schema,
     ids: ['id'],
-    knex: connection,
+    prisma: connection,
     convention: {
         toTableFieldName: field => toCamelCase(field)
     }
