@@ -1,4 +1,4 @@
-const { entity, field, id } = require('@herbsjs/gotu')
+const { entity, field, id } = require('@herbsjs/herbs')
 const Repository = require('../../../src/repository')
 const db = require('./db')
 const connection = require('../connection')
@@ -6,20 +6,23 @@ const assert = require('assert')
 
 describe('Query Find by ID', () => {
 
-    const table = 'test_repository'
-    const schema = 'herbs2knex_testdb'
+    const table = 'Sample'
+    const schema = 'public'
 
     before(async () => {
         const sql = `
         DROP SCHEMA IF EXISTS ${schema} CASCADE;
         CREATE SCHEMA ${schema};
-        DROP TABLE IF EXISTS ${schema}.${table} CASCADE; 
-        CREATE TABLE ${schema}.${table} (
+        DROP TABLE IF EXISTS ${schema}."${table}" CASCADE; 
+        CREATE TABLE ${schema}."${table}" (
             id INT,
             string_test TEXT,
             boolean_test BOOL
         )`
         await db.query(sql)
+
+        await db.query(`INSERT INTO ${schema}."${table}" (id, string_test, boolean_test) VALUES (10, 'marie', true)`)
+
     })
 
     after(async () => {
@@ -52,10 +55,9 @@ describe('Query Find by ID', () => {
             entity: anEntity,
             table,
             schema,
-            knex: connection
+            prisma: connection
         })
         const injection = {}
-        await db.query(`INSERT INTO ${schema}.${table} (id, string_test, boolean_test) VALUES (10, 'marie', true)`)
         const itemRepo = new ItemRepository(injection)
 
         //when

@@ -1,20 +1,18 @@
-const Convention = require('./convention')
-const DataMapper = require('./dataMapper')
 const { checker } = require('@herbsjs/suma')
 const { BaseEntity } = require("@herbsjs/gotu/src/baseEntity")
+const DataMapper = require('./dataMapper')
+// const Convention = require('./convention')
 
 module.exports = class Repository {
   constructor(options) {
-    this.convention = Object.assign(new Convention(), options.convention)
+    this.prisma = options.prisma
     this.table = options.table
     this.schema = options.schema
-    this.tableQualifiedName = this.schema
-      ? `${this.schema}.${this.table}`
-      : `${this.table}`
     this.entity = options.entity
+
+    // this.convention = Object.assign(new Convention(), options.convention)
     this.entityIDs = this.#getEntityIds(options)
     this.foreignKeys = options.foreignKeys
-    this.knex = options.knex
     this.dataMapper = new DataMapper(
       this.entity,
       this.entityIDs,
@@ -24,7 +22,7 @@ module.exports = class Repository {
   }
 
   runner() {
-    return this.knex(this.tableQualifiedName)
+    return this.prisma[this.table]
   }
 
   /** 
@@ -40,8 +38,12 @@ module.exports = class Repository {
 
     const parsedValue = Array.isArray(ids) ? ids : [ids]
     const ret = await this.runner()
-      .select(tableFields)
-      .whereIn(tableIDs[0], parsedValue)
+      .findMany({
+        where: {
+          [tableIDs[0]]: { in: parsedValue }
+        }
+      })
+    // .select(tableFields)
 
     const entities = []
 
@@ -50,47 +52,6 @@ module.exports = class Repository {
       entities.push(this.dataMapper.toEntity(row))
     }
 
-    return entities
-  }
-
-  async #executeFindQuery(query, options) {
-
-
-    if (options.where) {
-      const conditionTermTableField = this.dataMapper.toTableFieldName(Object.keys(options.where)[0])
-      const conditionTerm = Object.keys(options.where)[0]
-      if (!conditionTerm || conditionTerm === "0") throw "condition term is invalid"
-
-      const conditionValue = Array.isArray(options.where[conditionTerm])
-        ? options.where[conditionTerm]
-        : [options.where[conditionTerm]]
-
-      if (!options.where[conditionTerm] ||
-        (typeof options.where[conditionTerm] === "object" && !Array.isArray(options.where[conditionTerm])) ||
-        (Array.isArray(options.where[conditionTerm]) && !options.where[conditionTerm].length))
-        throw "condition value is invalid"
-
-      query = query.whereIn(conditionTermTableField, conditionValue)
-    }
-
-    if (options.orderBy) {
-      if (!options.orderBy || typeof options.orderBy === "object" && !Array.isArray(options.orderBy) && checker.isEmpty(options.orderBy)) throw "order by is invalid"
-      query = query.orderBy(options.orderBy)
-    }
-
-    const entities = []
-    const ret = await query
-
-    if (checker.isDefined(ret)) {
-      if (checker.isIterable(ret)) {
-        for (const row of ret) {
-          if (row === undefined) continue
-          entities.push(this.dataMapper.toEntity(row))
-        }
-      }
-      else
-        entities.push(this.dataMapper.toEntity(ret))
-    }
     return entities
   }
 
@@ -117,13 +78,13 @@ module.exports = class Repository {
     options.offset = options.offset || 0
     options.where = options.where || null
 
-    const tableFields = this.dataMapper.tableFields()
+    // const tableFields = this.dataMapper.tableFields()
 
     let query = this.runner()
-      .select(tableFields)
+    // .select(tableFields)
 
-    if (options.limit > 0) query = query.limit(options.limit)
-    if (options.offset > 0) query = query.offset(options.offset)
+    // if (options.limit > 0) query = query.limit(options.limit)
+    // if (options.offset > 0) query = query.offset(options.offset)
 
     return this.#executeFindQuery(query, options)
   }
@@ -161,14 +122,18 @@ module.exports = class Repository {
     where: null
   }) {
 
-    options.orderBy = options.orderBy || null
-    options.where = options.where || null
+    if (!checker.isEmpty(options.where)) this.#whereToTableFields(options.where)
 
     const tableFields = this.dataMapper.tableFields()
 
-    let query = this.runner().first(tableFields)
+    let ret = await this.runner()
+      .findUnique({
+        where: options.where,
+        // orderBy: options.orderBy
+      })
+    // .first(tableFields)
 
-    return this.#executeFindQuery(query, options)
+    return this.#resultToEntity(ret)
   }
 
   /** 
@@ -184,10 +149,11 @@ module.exports = class Repository {
     const payload = this.dataMapper.tableFieldsWithValue(entityInstance)
 
     const ret = await this.runner()
-      .returning(fields)
-      .insert(payload)
+      // .returning(fields)
+      .create({ data: payload })
 
-    return this.dataMapper.toEntity(ret[0])
+    return this.dataMapper.toEntity(ret)
+
   }
 
   /** 
@@ -204,15 +170,17 @@ module.exports = class Repository {
     const payload = this.dataMapper.tableFieldsWithValue(entityInstance)
 
     const ret = await this.runner()
-      .where(tableIDs[0], entityInstance[tableIDs[0]])
-      .returning(fields)
-      .update(payload)
+      // .returning(fields)
+      .update({
+        data: payload,
+        where: { [tableIDs[0]]: entityInstance[tableIDs[0]] }
+      })
 
     //.returning() is not supported by mysql or mysql2 and will not have any effect, update only return 1 to true or 0 to false
-    if(this.runner().client && this.runner().client.driverName && this.runner().client.driverName.includes('mysql'))
+    if (this.runner().client && this.runner().client.driverName && this.runner().client.driverName.includes('mysql'))
       return ret === 1
 
-    return this.dataMapper.toEntity(ret[0])
+    return this.dataMapper.toEntity(ret)
   }
 
   /** 
@@ -227,10 +195,68 @@ module.exports = class Repository {
     const tableIDs = this.dataMapper.tableIDs()
 
     const ret = await this.runner()
-      .where(tableIDs[0], entityInstance[tableIDs[0]])
-      .delete()
+      // .where(tableIDs[0], entityInstance[tableIDs[0]])
+      .delete({
+        where: {
+          [tableIDs[0]]: entityInstance[tableIDs[0]]
+        }
+      })
 
     return ret === 1
+  }
+
+  async #executeFindQuery(query, options) {
+    this.#whereToTableFields(options.where)
+
+    const ret = await query.findMany()
+    return this.#resultToEntity(ret)
+  }
+
+  #whereToTableFields(conditions) {
+    if (!checker.isEmpty(conditions)) {
+
+      Object.keys(conditions).map((key) => {
+        if (checker.isEmpty(conditions[key])) {
+          delete conditions[key]
+        }
+
+        const conditionTermTableField = this.dataMapper.toTableFieldName(key)
+        if (!key || key === "0") throw "condition term is invalid"
+
+        const conditionValue = Array.isArray(conditions[key])
+          ? conditions[key]
+          : [conditions[key]]
+
+        if (!conditions[key] ||
+          (typeof conditions[key] === "object" && !Array.isArray(conditions[key])) ||
+          (Array.isArray(conditions[key]) && !conditions[key].length))
+          throw "condition value is invalid"
+
+        delete conditions[key]
+        // conditions[conditionTermTableField] = { in: conditionValue }
+        conditions[conditionTermTableField] = conditionValue[0]
+      })
+    }
+  }
+
+  #resultToEntity(ret) {
+    const entities = []
+
+    if (!checker.isDefined(ret)) {
+      return entities
+    }
+
+    if (checker.isIterable(ret)) {
+      for (const row of ret) {
+        if (row === undefined) continue
+        entities.push(this.dataMapper.toEntity(row))
+      }
+    } else {
+      entities.push(this.dataMapper.toEntity(ret))
+    }
+
+    return entities
+
   }
 
   #getEntityIds({ entity, ids }) {

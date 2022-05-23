@@ -1,4 +1,4 @@
-const { entity, field, id } = require('@herbsjs/gotu')
+const { entity, field, id } = require('@herbsjs/herbs')
 const Repository = require('../../../src/repository')
 const db = require('./db')
 const connection = require('../connection')

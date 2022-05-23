@@ -1,4 +1,4 @@
-const { entity, field, id } = require('@herbsjs/gotu')
+const { entity, field, id } = require('@herbsjs/herbs')
 const Repository = require('../../../src/repository')
 const db = require('./db')
 const connection = require('../connection')
@@ -6,15 +6,15 @@ const assert = require('assert')
 
 describe('Persist Entity', () => {
 
-    const table = 'test_repository'
-    const schema = 'herbs2knex_testdb'
+    const table = 'Sample'
+    const schema = 'public'
 
     before(async () => {
         const sql = `
         DROP SCHEMA IF EXISTS ${schema} CASCADE;
         CREATE SCHEMA ${schema};
-        DROP TABLE IF EXISTS ${schema}.${table} CASCADE; 
-        CREATE TABLE ${schema}.${table} (
+        DROP TABLE IF EXISTS ${schema}."${table}" CASCADE; 
+        CREATE TABLE ${schema}."${table}" (
             id INT,
             string_test TEXT,
             boolean_test BOOL,
@@ -65,7 +65,7 @@ describe('Persist Entity', () => {
                 entity: anEntity,
                 table,
                 schema,
-                knex: connection
+                prisma: connection
             })
             const aModifiedInstance = givenAnModifiedEntity()
 
@@ -73,10 +73,10 @@ describe('Persist Entity', () => {
             const itemRepo = new ItemRepository(injection)
 
             //when
-            const ret = await itemRepo.insert(aModifiedInstance)
+            await itemRepo.insert(aModifiedInstance)
             
             //then
-            const retDB = await db.query(`SELECT string_test FROM ${schema}.${table} WHERE id = ${aModifiedInstance.id}`)
+            const retDB = await db.query(`SELECT string_test FROM ${schema}."${table}" WHERE id = ${aModifiedInstance.id}`)
             assert.deepStrictEqual(retDB.rows[0].string_test, "test")
         })
     })

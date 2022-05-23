@@ -1,6 +1,6 @@
 {
   "name": "@herbsjs/herbs2prisma",
-  "version": "1.5.0",
+  "version": "0.0.1",
   "description": "Herbs2prisma is a tool to convert your Herbs schema to a Prisma schema and helps developers integrate with database easily.",
   "main": "./src/herbs2prisma.js",
   "scripts": {
@@ -33,13 +33,14 @@
     "DDD",
     "clean architecture"
   ],
-  "author": "Enderson Costa",
+  "author": "Maik Braga",
   "license": "MIT",
   "homepage": "https://github.com/herbsjs/herbs2prisma#readme",
   "dependencies": {
-    "@herbsjs/gotu": "^1.1.2",
-    "@herbsjs/suma": "^1.3.1",
-    "knex": "^2.0.0"
+    "@herbsjs/herbs": "^1.4.5",
+    "@prisma/client": "^3.14.0",
+    "knex": "^2.0.0",
+    "prisma": "^3.14.0"
   },
   "devDependencies": {
     "@babel/core": "^7.18.0",
@@ -68,11 +69,11 @@
     "tedious": "^14.5.0"
   },
   "peerDependencies": {
-    "pg": "^8.7.3",
+    "bluebird": "^3.7.2",
     "mssql": "^8.1.1",
-    "tedious": "^14.5.0",
     "mysql2": "^2.3.2",
-    "bluebird": "^3.7.2"
+    "pg": "^8.7.3",
+    "tedious": "^14.5.0"
   },
   "peerDependenciesMeta": {
     "pg": {

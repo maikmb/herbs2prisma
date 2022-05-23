@@ -1,4 +1,4 @@
-const { entity, field, id } = require('@herbsjs/gotu')
+const { entity, field, id } = require('@herbsjs/herbs')
 const Repository = require('../../../src/repository')
 const assert = require('assert')
 const { RequestTokenHandler } = require('tedious/lib/token/handler')
