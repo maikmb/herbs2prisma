@@ -40,7 +40,7 @@
     "@herbsjs/herbs": "^1.4.5",
     "@prisma/client": "^3.14.0",
     "knex": "^2.0.0",
-    "prisma": "^3.14.0"
+    "prisma": "^3.15.0"
   },
   "devDependencies": {
     "@babel/core": "^7.18.0",
