@@ -67,26 +67,24 @@ module.exports = class Repository {
 * @return {type} List of entities
 */
   async find(options = {
-    limit: 0,
-    offset: 0,
+    limit: null,
+    offset: null,
     orderBy: null,
     where: null
   }) {
 
-    options.orderBy = options.orderBy || null
-    options.limit = options.limit || 0
-    options.offset = options.offset || 0
-    options.where = options.where || null
+    const filter = {}
 
-    // const tableFields = this.dataMapper.tableFields()
+    if (options.where) filter.where = options.where
+    if (options.orderBy) filter.orderBy = options.orderBy
+    if (options.limit) filter.take = options.limit
+    if (options.offset) filter.skip = options.offset
+
+    filter.select = this.dataMapper.tableFields()
 
     let query = this.runner()
-    // .select(tableFields)
 
-    // if (options.limit > 0) query = query.limit(options.limit)
-    // if (options.offset > 0) query = query.offset(options.offset)
-
-    return this.#executeFindQuery(query, options)
+    return this.#executeFindQuery(query, filter)
   }
 
   /** 
@@ -192,23 +190,26 @@ module.exports = class Repository {
   * @return {type} True when success
   */
   async delete(entityInstance) {
-    const tableIDs = this.dataMapper.tableIDs()
+    try {
 
-    const ret = await this.runner()
-      // .where(tableIDs[0], entityInstance[tableIDs[0]])
-      .delete({
-        where: {
-          [tableIDs[0]]: entityInstance[tableIDs[0]]
-        }
-      })
+      const tableIDs = this.dataMapper.tableIDs()
+      await this.runner()
+        .delete({
+          where: {
+            [tableIDs[0]]: entityInstance[tableIDs[0]]
+          }
+        })
 
-    return ret === 1
+      return true
+    } catch (error) {
+      return false
+    }
   }
 
   async #executeFindQuery(query, options) {
     this.#whereToTableFields(options.where)
 
-    const ret = await query.findMany()
+    const ret = await query.findMany(options)
     return this.#resultToEntity(ret)
   }
 

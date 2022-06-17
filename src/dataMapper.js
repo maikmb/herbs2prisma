@@ -60,7 +60,10 @@ class DataMapper {
     tableFields() {
         return this.allFields
             .filter((i) => !i.isEntity)
-            .map((i) => i.nameDb)
+            .reduce((select, field) => {
+                select[field.nameDb] = true
+                return select
+            }, {})
     }
 
     tableFieldsWithValue(instance) {
