@@ -1,6 +1,7 @@
 const { entity, field, id } = require("@herbsjs/gotu")
 const Repository = require("../../../src/repository")
 const assert = require("assert")
+const prisma = require("../connection")
 
 describe("Insert an Entity", () => {
   const givenAnEntity = () => {
@@ -23,31 +24,17 @@ describe("Insert an Entity", () => {
     }
   }
 
-  const knex = (ret, spy = {}) => (
-    () => ({
-      returning: (f) => {
-        spy.fields = f
-        return {
-          insert: (p) => {
-            spy.payload = p
-            return ret
-          }
-        }
-      }
-    })
-  )
-
 
   it("should insert an entity", async () => {
     //given
     let spy = {}
-    const retFromDeb = [{ id: 1 }]
+    const retFromDeb = { id: 1 }
     const anEntity = givenAnEntity()
     const ItemRepository = givenAnRepositoryClass()
     const itemRepo = new ItemRepository({
       entity: anEntity,
       table: "aTable",
-      knex: knex(retFromDeb, spy)
+      prisma: prisma(retFromDeb, spy)
     })
 
     anEntity.id = 2
@@ -59,21 +46,20 @@ describe("Insert an Entity", () => {
 
     //then
     assert.deepStrictEqual(ret.id, 1)
-    assert.deepStrictEqual(spy.fields, ['id', 'string_test', 'boolean_test'])
-    assert.deepStrictEqual(spy.payload, { id: 2, string_test: 'test', boolean_test: true })
+    assert.deepStrictEqual(spy.data, { id: 2, string_test: 'test', boolean_test: true })
   })
 
   it("should insert an entity with foreign key", async () => {
     //given
     let spy = {}
-    const retFromDeb = [{ id: 2 }]
+    const retFromDeb = { id: 2 }
     const anEntity = givenAnEntity()
     const ItemRepository = givenAnRepositoryClass()
     const itemRepo = new ItemRepository({
       entity: anEntity,
       table: "aTable",
       foreignKeys: [{ fkField: String }],
-      knex: knex(retFromDeb, spy)
+      prisma: prisma(retFromDeb, spy)
     })
 
     anEntity.id = 2
@@ -86,7 +72,6 @@ describe("Insert an Entity", () => {
 
     //then
     assert.deepStrictEqual(ret.id, 2)
-    assert.deepStrictEqual(spy.fields, ['id', 'string_test', 'boolean_test', 'fk_field'])
-    assert.deepStrictEqual(spy.payload, { id: 2, string_test: 'test', boolean_test: true, fk_field: 42 })
+    assert.deepStrictEqual(spy.data, { id: 2, string_test: 'test', boolean_test: true, fk_field: 42 })
   })
 })

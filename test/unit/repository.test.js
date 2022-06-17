@@ -2,6 +2,7 @@ const { entity, field, id } = require('@herbsjs/herbs')
 const Repository = require('../../src/repository')
 const assert = require('assert')
 const Convention = require('../../src/convention')
+const prisma = require('./connection')
 
 describe('Repository', () => {
   const EmptyEntity = entity('Empty', {})
@@ -37,33 +38,7 @@ describe('Repository', () => {
       })
 
       assert.equal(repositoryInstance.table, tableName)
-    })
-
-    it('should use the table name as tableQualifiedName when no schema is specified', () => {
-      const tableName = 'my_sql_table'
-
-      const repositoryInstance = new Repository({
-        entity: EmptyEntity,
-        table: tableName,
-      })
-
-      assert.equal(repositoryInstance.tableQualifiedName, tableName)
-    })
-
-    it('should use the schema and the table name to define the tableQualifiedName', () => {
-      const tableName = 'my_sql_table'
-      const schema = 'my_schema'
-
-      const repositoryInstance = new Repository({
-        entity: EmptyEntity,
-        table: tableName,
-        schema,
-      })
-
-      const tableQualifiedName = `${schema}.${tableName}`
-
-      assert.equal(repositoryInstance.tableQualifiedName, tableQualifiedName)
-    })
+    })   
 
     it('should use the specified entity', () => {
       const repositoryInstance = new Repository({
@@ -121,14 +96,14 @@ describe('Repository', () => {
     })
 
     it('should use the specified knex instance', () => {
-      const knex = {}
+      const prisma = {}
 
       const repositoryInstance = new Repository({
         entity: EmptyEntity,
-        knex,
+        prisma: prisma,
       })
 
-      assert.equal(repositoryInstance.knex, knex)
+      assert.equal(repositoryInstance.prisma, prisma)
     })
   })
 })

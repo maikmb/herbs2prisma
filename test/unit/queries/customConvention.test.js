@@ -1,6 +1,7 @@
 const { entity, field } = require('@herbsjs/herbs')
 const Repository = require('../../../src/repository')
 const assert = require('assert')
+const prisma = require('../connection')
 
 describe('Custom Convention Repository', () => {
   context('Find all data with custom convention', () => {
@@ -27,13 +28,7 @@ describe('Custom Convention Repository', () => {
           super(options)
         }
       }
-    }
-
-    const knexCustomConvention = ret => () => ({
-      select: () => {
-        return ret
-      }
-    })
+    }   
 
     it('should return entities using custom conventions in repository', async () => {
       // given
@@ -45,7 +40,7 @@ describe('Custom Convention Repository', () => {
         entity: anEntity,
         table: 'aTable',
         ids: ['id'],
-        knex: knexCustomConvention(retFromDeb),
+        prisma: prisma(retFromDeb),
         convention: {
           toTableFieldName: fieldName => {
             spy.push(`${fieldName}_custom`)
@@ -81,7 +76,7 @@ describe('Custom Convention Repository', () => {
           entity: anEntity,
           table: 'aTable',
           ids: ['id'],
-          knex: knex(retFromDeb),
+          prisma: prisma(retFromDeb),
           convention: {
             toTableFieldName: () => {
               throw new Error('Custom convention failed')

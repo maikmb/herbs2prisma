@@ -77,7 +77,7 @@ describe('Data Mapper', () => {
             const toEntity = dataMapper.tableFields()
 
             //then
-            assert.deepStrictEqual(toEntity, ['id_field', 'field1', 'field_name'])
+            assert.deepStrictEqual(toEntity, { 'id_field': true, 'field1': true, 'field_name': true })
         })
 
         it('should retrieve table fields with values', () => {

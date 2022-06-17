@@ -1,7 +1,8 @@
 const { checker } = require('@herbsjs/suma')
 const { BaseEntity } = require("@herbsjs/gotu/src/baseEntity")
 const DataMapper = require('./dataMapper')
-// const Convention = require('./convention')
+const Convention = require('./convention')
+const { isArray } = require('lodash')
 
 module.exports = class Repository {
   constructor(options) {
@@ -10,7 +11,7 @@ module.exports = class Repository {
     this.schema = options.schema
     this.entity = options.entity
 
-    // this.convention = Object.assign(new Convention(), options.convention)
+    this.convention = Object.assign(new Convention(), options.convention)
     this.entityIDs = this.#getEntityIds(options)
     this.foreignKeys = options.foreignKeys
     this.dataMapper = new DataMapper(
@@ -36,14 +37,14 @@ module.exports = class Repository {
     const tableIDs = this.dataMapper.tableIDs()
     const tableFields = this.dataMapper.tableFields()
 
-    const parsedValue = Array.isArray(ids) ? ids : [ids]
+    const parsedValue = isArray(ids) ? { in: ids } : ids
     const ret = await this.runner()
       .findMany({
+        select: tableFields,
         where: {
-          [tableIDs[0]]: { in: parsedValue }
+          [tableIDs[0]]: parsedValue
         }
       })
-    // .select(tableFields)
 
     const entities = []
 
@@ -126,10 +127,10 @@ module.exports = class Repository {
 
     let ret = await this.runner()
       .findUnique({
+        select: tableFields,
         where: options.where,
-        // orderBy: options.orderBy
+        orderBy: options.orderBy
       })
-    // .first(tableFields)
 
     return this.#resultToEntity(ret)
   }
@@ -143,11 +144,9 @@ module.exports = class Repository {
   * @return {type} Current entity
   */
   async insert(entityInstance) {
-    const fields = this.dataMapper.tableFields()
     const payload = this.dataMapper.tableFieldsWithValue(entityInstance)
 
     const ret = await this.runner()
-      // .returning(fields)
       .create({ data: payload })
 
     return this.dataMapper.toEntity(ret)
@@ -164,11 +163,9 @@ module.exports = class Repository {
   */
   async update(entityInstance) {
     const tableIDs = this.dataMapper.tableIDs()
-    const fields = this.dataMapper.tableFields()
     const payload = this.dataMapper.tableFieldsWithValue(entityInstance)
 
     const ret = await this.runner()
-      // .returning(fields)
       .update({
         data: payload,
         where: { [tableIDs[0]]: entityInstance[tableIDs[0]] }
@@ -224,18 +221,15 @@ module.exports = class Repository {
         const conditionTermTableField = this.dataMapper.toTableFieldName(key)
         if (!key || key === "0") throw "condition term is invalid"
 
-        const conditionValue = Array.isArray(conditions[key])
-          ? conditions[key]
-          : [conditions[key]]
+        const conditionValue = conditions[key]
 
         if (!conditions[key] ||
-          (typeof conditions[key] === "object" && !Array.isArray(conditions[key])) ||
-          (Array.isArray(conditions[key]) && !conditions[key].length))
+          (typeof conditions[key] === "object" && !isArray(conditions[key])) ||
+          (isArray(conditions[key]) && !conditions[key].length))
           throw "condition value is invalid"
 
         delete conditions[key]
-        // conditions[conditionTermTableField] = { in: conditionValue }
-        conditions[conditionTermTableField] = conditionValue[0]
+        conditions[conditionTermTableField] = isArray(conditionValue) ? { in: conditionValue } : conditionValue
       })
     }
   }

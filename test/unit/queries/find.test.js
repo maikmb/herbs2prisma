@@ -3,7 +3,7 @@ const Repository = require('../../../src/repository')
 const assert = require('assert')
 const prisma = require('../connection')
 
-describe.only('Query Find', () => {
+describe('Query Find', () => {
 
     context('Find all data', () => {
 
@@ -236,7 +236,7 @@ describe.only('Query Find', () => {
             assert.deepStrictEqual(ret[0].toJSON(), { id: 1, stringTest: 'john', booleanTest: true, entityTest: undefined, entitiesTest: undefined })
             assert.deepStrictEqual(ret[1].toJSON(), { id: 2, stringTest: 'clare', booleanTest: false, entityTest: undefined, entitiesTest: undefined })
             assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
-            assert.deepStrictEqual(spy.where, { 'string_test': 'john' })
+            assert.deepStrictEqual(spy.where, { 'string_test': { in: ['john'] } })
         })
 
         it('should return entities using foreing key', async () => {
@@ -261,9 +261,8 @@ describe.only('Query Find', () => {
             //then
             assert.deepStrictEqual(ret[0].toJSON({ allowExtraKeys: true }), { id: 1, stringTest: 'john', booleanTest: true, entityTest: undefined, entitiesTest: undefined, fkField: "21" })
             assert.deepStrictEqual(ret[1].toJSON({ allowExtraKeys: true }), { id: 2, stringTest: 'clare', booleanTest: false, entityTest: undefined, entitiesTest: undefined, fkField: null })
-            assert.deepStrictEqual(spy.select, ['id', 'string_test', 'boolean_test', 'fk_field'])
-            assert.deepStrictEqual(spy.where, 'fk_field')
-            assert.deepStrictEqual(spy.value, [1])
+            assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true, 'fk_field': true })
+            assert.deepStrictEqual(spy.where, { 'fk_field': 1 })
         })
 
 

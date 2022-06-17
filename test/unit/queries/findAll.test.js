@@ -1,6 +1,7 @@
 const { entity, field, id } = require('@herbsjs/herbs')
 const Repository = require('../../../src/repository')
 const assert = require('assert')
+const prisma = require('../connection')
 
 describe('Query Find All', () => {
 
@@ -24,36 +25,6 @@ describe('Query Find All', () => {
         }
     }
 
-    const knexNoFilter = (ret, spy = {}) => (
-        () => ({
-            select: (s) => {
-                spy.select = s
-                return ret
-            }
-        })
-    )
-
-    const knex = (ret, spy = {}) => (
-        () => ({
-            select: (s) => {
-                spy.select = s
-                return {
-                    orderBy: (o) => {
-                        spy.orderBy = o
-                        return ret
-                    },
-                    limit: (o) => {
-                        spy.limit = o
-                        return ret.slice(0, o)
-                    },
-                    offset: (o) => {
-                        spy.offset = o
-                        return ret
-                    }
-                }
-            }
-        })
-    )
 
     it('should return entities using table field', async () => {
         //given
@@ -67,7 +38,7 @@ describe('Query Find All', () => {
         const itemRepo = new ItemRepository({
             entity: anEntity,
             table: 'aTable',
-            knex: knexNoFilter(retFromDeb, spy)
+            prisma: prisma(retFromDeb, spy)
         })
 
         //when
@@ -89,7 +60,7 @@ describe('Query Find All', () => {
         const itemRepo = new ItemRepository({
             entity: anEntity,
             table: 'aTable',
-            knex: knex(retFromDeb, spy)
+            prisma: prisma(retFromDeb, spy)
         })
 
         //when
@@ -97,7 +68,7 @@ describe('Query Find All', () => {
 
         //then
         assert.strictEqual(ret.length, 2)
-        assert.deepStrictEqual(spy.select, ['id', 'string_test', 'boolean_test'])
+        assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
         assert.deepStrictEqual(spy.orderBy, 'stringTest')
     })
 
@@ -113,7 +84,7 @@ describe('Query Find All', () => {
         const itemRepo = new ItemRepository({
             entity: anEntity,
             table: 'aTable',
-            knex: knex(retFromDeb, spy)
+            prisma: prisma(retFromDeb, spy)
         })
 
         //when
@@ -121,8 +92,8 @@ describe('Query Find All', () => {
 
         //then
         assert.strictEqual(ret.length, 1)
-        assert.deepStrictEqual(spy.select, ['id', 'string_test', 'boolean_test'])
-        assert.deepStrictEqual(spy.limit, 1)
+        assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
+        assert.deepStrictEqual(spy.take, 1)
     })
 
     it('should return all entities when limit is 0', async () => {
@@ -137,7 +108,7 @@ describe('Query Find All', () => {
         const itemRepo = new ItemRepository({
             entity: anEntity,
             table: 'aTable',
-            knex: knexNoFilter(retFromDeb, spy)
+            prisma: prisma(retFromDeb, spy)
         })
 
         //when
@@ -145,7 +116,7 @@ describe('Query Find All', () => {
 
         //then
         assert.strictEqual(ret.length, 2)
-        assert.deepStrictEqual(spy.select, ['id', 'string_test', 'boolean_test'])
+        assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
     })
 
     it('should return data with offset', async () => {
@@ -160,7 +131,7 @@ describe('Query Find All', () => {
         const itemRepo = new ItemRepository({
             entity: anEntity,
             table: 'aTable',
-            knex: knex(retFromDeb, spy)
+            prisma: prisma(retFromDeb, spy)
         })
 
         //when
@@ -168,8 +139,8 @@ describe('Query Find All', () => {
 
         //then
         assert.strictEqual(ret.length, 2)
-        assert.deepStrictEqual(spy.select, ['id', 'string_test', 'boolean_test'])
-        assert.deepStrictEqual(spy.offset, 10)
+        assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
+        assert.deepStrictEqual(spy.skip, 10)
     })
 
     it('should return entities with complex order by', async () => {
@@ -184,7 +155,7 @@ describe('Query Find All', () => {
         const itemRepo = new ItemRepository({
             entity: anEntity,
             table: 'aTable',
-            knex: knex(retFromDeb, spy)
+            prisma: prisma(retFromDeb, spy)
         })
 
         //when
@@ -192,7 +163,7 @@ describe('Query Find All', () => {
 
         //then
         assert.strictEqual(ret.length, 2)
-        assert.deepStrictEqual(spy.select, ['id', 'string_test', 'boolean_test'])
+        assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
         assert.deepStrictEqual(spy.orderBy, [{ column: 'nome', order: 'desc' }, 'email'])
     })
 
@@ -208,7 +179,7 @@ describe('Query Find All', () => {
         const itemRepo = new ItemRepository({
             entity: anEntity,
             table: 'aTable',
-            knex: knex(retFromDeb, spy)
+            prisma: prisma(retFromDeb, spy)
         })
 
         try {
