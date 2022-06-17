@@ -1,9 +1,9 @@
 const { entity, field, id } = require('@herbsjs/herbs')
 const Repository = require('../../../src/repository')
 const assert = require('assert')
-const { RequestTokenHandler } = require('tedious/lib/token/handler')
+const prisma = require('../connection')
 
-describe('Query Find', () => {
+describe.only('Query Find', () => {
 
     context('Find all data', () => {
 
@@ -27,35 +27,6 @@ describe('Query Find', () => {
             }
         }
 
-        const knexNoFilter = (ret, spy = {}) => (
-            () => ({
-                select: (s) => {
-                    spy.select = s
-                    return ret
-                }
-            })
-        )
-
-        const knex = (ret, spy = {}) => (() => ({
-            select: (s) => {
-                spy.select = s
-                return {
-                    orderBy: (o) => {
-                        spy.orderBy = o
-                        return ret
-                    },
-                    limit: (o) => {
-                        spy.limit = o
-                        return ret.slice(0, o)
-                    },
-                    offset: (o) => {
-                        spy.offset = o
-                        return ret
-                    },
-                }
-            }
-        }))
-
         it('should return entities using table field', async () => {
             //given
             let spy = {}
@@ -68,7 +39,7 @@ describe('Query Find', () => {
             const itemRepo = new ItemRepository({
                 entity: anEntity,
                 table: 'aTable',
-                knex: knexNoFilter(retFromDeb, spy)
+                prisma: prisma(retFromDeb, spy)
             })
 
             //when
@@ -90,7 +61,7 @@ describe('Query Find', () => {
             const itemRepo = new ItemRepository({
                 entity: anEntity,
                 table: 'aTable',
-                knex: knex(retFromDeb, spy)
+                prisma: prisma(retFromDeb, spy)
             })
 
             //when
@@ -98,7 +69,7 @@ describe('Query Find', () => {
 
             //then
             assert.strictEqual(ret.length, 2)
-            assert.deepStrictEqual(spy.select, ['id', 'string_test', 'boolean_test'])
+            assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
             assert.deepStrictEqual(spy.orderBy, 'stringTest')
         })
 
@@ -114,7 +85,7 @@ describe('Query Find', () => {
             const itemRepo = new ItemRepository({
                 entity: anEntity,
                 table: 'aTable',
-                knex: knex(retFromDeb, spy)
+                prisma: prisma(retFromDeb, spy)
             })
 
             //when
@@ -122,8 +93,8 @@ describe('Query Find', () => {
 
             //then
             assert.strictEqual(ret.length, 1)
-            assert.deepStrictEqual(spy.select, ['id', 'string_test', 'boolean_test'])
-            assert.deepStrictEqual(spy.limit, 1)
+            assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
+            assert.deepStrictEqual(spy.take, 1)
         })
 
         it('should return all entities when limit is 0', async () => {
@@ -138,7 +109,7 @@ describe('Query Find', () => {
             const itemRepo = new ItemRepository({
                 entity: anEntity,
                 table: 'aTable',
-                knex: knexNoFilter(retFromDeb, spy)
+                prisma: prisma(retFromDeb, spy)
             })
 
             //when
@@ -146,7 +117,7 @@ describe('Query Find', () => {
 
             //then
             assert.strictEqual(ret.length, 2)
-            assert.deepStrictEqual(spy.select, ['id', 'string_test', 'boolean_test'])
+            assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
         })
 
         it('should return data with offset', async () => {
@@ -161,7 +132,7 @@ describe('Query Find', () => {
             const itemRepo = new ItemRepository({
                 entity: anEntity,
                 table: 'aTable',
-                knex: knex(retFromDeb, spy)
+                prisma: prisma(retFromDeb, spy)
             })
 
             //when
@@ -169,8 +140,8 @@ describe('Query Find', () => {
 
             //then
             assert.strictEqual(ret.length, 2)
-            assert.deepStrictEqual(spy.select, ['id', 'string_test', 'boolean_test'])
-            assert.deepStrictEqual(spy.offset, 10)
+            assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
+            assert.deepStrictEqual(spy.skip, 10)
         })
 
         it('should return entities with complex order by', async () => {
@@ -185,7 +156,7 @@ describe('Query Find', () => {
             const itemRepo = new ItemRepository({
                 entity: anEntity,
                 table: 'aTable',
-                knex: knex(retFromDeb, spy)
+                prisma: prisma(retFromDeb, spy)
             })
 
             //when
@@ -193,7 +164,7 @@ describe('Query Find', () => {
 
             //then
             assert.strictEqual(ret.length, 2)
-            assert.deepStrictEqual(spy.select, ['id', 'string_test', 'boolean_test'])
+            assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
             assert.deepStrictEqual(spy.orderBy, [{ column: 'nome', order: 'desc' }, 'email'])
         })
 
@@ -209,7 +180,7 @@ describe('Query Find', () => {
             const itemRepo = new ItemRepository({
                 entity: anEntity,
                 table: 'aTable',
-                knex: knex(retFromDeb, spy)
+                prisma: prisma(retFromDeb, spy)
             })
 
             try {
@@ -243,21 +214,6 @@ describe('Query Find', () => {
             }
         }
 
-        const knex = (ret, spy = {}) => (
-            () => ({
-                select: (s) => {
-                    spy.select = s
-                    return {
-                        whereIn: (w, v) => {
-                            spy.where = w
-                            spy.value = v
-                            return ret
-                        }
-                    }
-                }
-            })
-        )
-
         it('should return entities using table field', async () => {
             //given
             let spy = {}
@@ -270,7 +226,7 @@ describe('Query Find', () => {
             const itemRepo = new ItemRepository({
                 entity: anEntity,
                 table: 'aTable',
-                knex: knex(retFromDeb, spy)
+                prisma: prisma(retFromDeb, spy)
             })
 
             //when
@@ -279,8 +235,8 @@ describe('Query Find', () => {
             //then
             assert.deepStrictEqual(ret[0].toJSON(), { id: 1, stringTest: 'john', booleanTest: true, entityTest: undefined, entitiesTest: undefined })
             assert.deepStrictEqual(ret[1].toJSON(), { id: 2, stringTest: 'clare', booleanTest: false, entityTest: undefined, entitiesTest: undefined })
-            assert.deepStrictEqual(spy.select, ['id', 'string_test', 'boolean_test'])
-            assert.deepStrictEqual(spy.value, ["john"])
+            assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
+            assert.deepStrictEqual(spy.where, { 'string_test': 'john' })
         })
 
         it('should return entities using foreing key', async () => {
@@ -296,7 +252,7 @@ describe('Query Find', () => {
                 entity: anEntity,
                 table: 'aTable',
                 foreignKeys: [{ fkField: String }],
-                knex: knex(retFromDeb, spy)
+                prisma: prisma(retFromDeb, spy)
             })
 
             //when
@@ -323,7 +279,7 @@ describe('Query Find', () => {
             const itemRepo = new ItemRepository({
                 entity: anEntity,
                 table: 'aTable',
-                knex: knex(retFromDeb, spy)
+                prisma: prisma(retFromDeb, spy)
             })
 
             try {
@@ -347,7 +303,7 @@ describe('Query Find', () => {
             const itemRepo = new ItemRepository({
                 entity: anEntity,
                 table: 'aTable',
-                knex: knex(retFromDeb, spy)
+                prisma: prisma(retFromDeb, spy)
 
             })
 

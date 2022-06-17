@@ -19,9 +19,10 @@ describe("Delete an Entity", () => {
     }
   }
 
-  const knex = () => ({
-    where: (columns) =>
-      ({ delete: (columns) => 1 })
+  const prisma = new Proxy([], {
+    get: () => ({
+      delete: (options) => 1
+    })
   })
 
 
@@ -32,7 +33,7 @@ describe("Delete an Entity", () => {
     const itemRepo = new ItemRepository({
       entity: anEntity,
       table: "aTable",
-      knex
+      prisma
     })
 
     anEntity.id = 1
