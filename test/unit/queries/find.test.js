@@ -70,7 +70,7 @@ describe('Query Find', () => {
             //then
             assert.strictEqual(ret.length, 2)
             assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
-            assert.deepStrictEqual(spy.orderBy, 'stringTest')
+            assert.deepStrictEqual(spy.orderBy, { 'stringTest': 'asc' })
         })
 
         it('should return entities with limit', async () => {
