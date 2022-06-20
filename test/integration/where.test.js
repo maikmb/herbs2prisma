@@ -6,7 +6,7 @@ const assert = require('assert')
 
 describe('Query Find By', () => {
 
-    const table = 'test_repository'
+    const table = 'Sample'
     const schema = 'herbs2knex_testdb'
 
     before(async () => {

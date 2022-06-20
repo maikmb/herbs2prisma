@@ -2,8 +2,6 @@ const { checker } = require('@herbsjs/suma')
 const { BaseEntity } = require("@herbsjs/gotu/src/baseEntity")
 const DataMapper = require('./dataMapper')
 const Convention = require('./convention')
-const { isArray } = require('lodash')
-
 module.exports = class Repository {
   constructor(options) {
     this.prisma = options.prisma
@@ -23,7 +21,9 @@ module.exports = class Repository {
   }
 
   runner() {
-    return this.prisma[this.table]
+    const query = this.prisma[this.table]
+    if (checker.isEmpty(query)) throw new Error(`Table (${this.table}) not found. Please check your prisma model.`)
+    return query
   }
 
   /** 
@@ -37,7 +37,7 @@ module.exports = class Repository {
     const tableIDs = this.dataMapper.tableIDs()
     const tableFields = this.dataMapper.tableFields()
 
-    const parsedValue = isArray(ids) ? { in: ids } : ids
+    const parsedValue = checker.isArray(ids) ? { in: ids } : ids
     const ret = await this.runner()
       .findMany({
         select: tableFields,
@@ -121,12 +121,15 @@ module.exports = class Repository {
     where: null
   }) {
 
-    if (!checker.isEmpty(options.where)) this.#whereToTableFields(options.where)
+    if (!checker.isEmpty(options.where)) options.where = this.#whereToTableFields(options.where)
+    if (!checker.isEmpty(options.orderBy)) options.orderBy = this.#orderByToTableFields(options.orderBy)
 
     const tableFields = this.dataMapper.tableFields()
 
     let ret = await this.runner()
-      .findUnique({
+      .findMany({
+        skip: 0,
+        take: 1,
         select: tableFields,
         where: options.where,
         orderBy: options.orderBy
@@ -204,34 +207,72 @@ module.exports = class Repository {
   }
 
   async #executeFindQuery(query, options) {
-    this.#whereToTableFields(options.where)
+    if (!checker.isEmpty(options.where)) options.where = this.#whereToTableFields(options.where)
+    if (!checker.isEmpty(options.orderBy)) options.orderBy = this.#orderByToTableFields(options.orderBy)
 
     const ret = await query.findMany(options)
     return this.#resultToEntity(ret)
   }
 
-  #whereToTableFields(conditions) {
-    if (!checker.isEmpty(conditions)) {
+  #orderByToTableFields(conditions) {
+    if (checker.isEmpty(conditions)) return null
+    if (checker.isObject(conditions) && !checker.isArray(conditions)) conditions
 
-      Object.keys(conditions).map((key) => {
-        if (checker.isEmpty(conditions[key])) {
-          delete conditions[key]
-        }
-
-        const conditionTermTableField = this.dataMapper.toTableFieldName(key)
-        if (!key || key === "0") throw "condition term is invalid"
-
-        const conditionValue = conditions[key]
-
-        if (!conditions[key] ||
-          (typeof conditions[key] === "object" && !isArray(conditions[key])) ||
-          (isArray(conditions[key]) && !conditions[key].length))
-          throw "condition value is invalid"
-
-        delete conditions[key]
-        conditions[conditionTermTableField] = isArray(conditionValue) ? { in: conditionValue } : conditionValue
-      })
+    if (!checker.isObject(conditions) && !checker.isArray(conditions)) {
+      conditions = { [conditions]: 'asc' }
+      return conditions
     }
+
+    conditions.forEach((value, index) => {
+      if (checker.isEmpty(value)) {
+        delete conditions[index]
+        return
+      }
+
+      if (checker.isString(value)) {
+        const conditionTermTableField = this.dataMapper.toTableFieldName(value)
+        conditions[index] = { [conditionTermTableField]: 'asc' }
+        return conditions
+      }
+
+      const [conditionTermField] = Object.keys(value)
+      if (!conditionTermField || conditionTermField === "0") throw "condition term is invalid"
+
+      const conditionTermTableField = this.dataMapper.toTableFieldName(conditionTermField)
+
+      if (checker.isArray(value)) throw "condition value is invalid"
+      const conditionTermValue = value[conditionTermField]
+
+      conditions[index] = { [conditionTermTableField]: conditionTermValue }
+    })
+
+    return conditions
+  }
+
+  #whereToTableFields(conditions) {
+    if (checker.isEmpty(conditions)) return
+
+    Object.keys(conditions).map((key) => {
+      if (checker.isEmpty(conditions[key])) {
+        delete conditions[key]
+        return
+      }
+
+      const conditionTermTableField = this.dataMapper.toTableFieldName(key)
+      if (!key || key === "0") throw "condition term is invalid"
+
+      const conditionValue = conditions[key]
+
+      if (checker.isEmpty(conditions[key]) ||
+        (checker.isObject(conditions[key]) && !checker.isArray(conditions[key])) ||
+        (checker.isArray(conditions[key]) && checker.isEmpty(conditions[key])))
+        throw "condition value is invalid"
+
+      delete conditions[key]
+      conditions[conditionTermTableField] = checker.isArray(conditionValue) ? { in: conditionValue } : conditionValue
+    })
+
+    return conditions
   }
 
   #resultToEntity(ret) {

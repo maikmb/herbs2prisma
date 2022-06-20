@@ -70,7 +70,7 @@ describe('Query First', () => {
             //then
             assert.strictEqual(ret.length, 1)
             assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
-            assert.deepStrictEqual(spy.orderBy, 'stringTest')
+            assert.deepStrictEqual(spy.orderBy, { stringTest: 'asc' })
         })
 
         it('should return when order by is complex', async () => {
@@ -90,13 +90,13 @@ describe('Query First', () => {
 
 
             //when
-            const ret = await itemRepo.first({ orderBy: [{ column: 'string_test', order: 'desc' }, 'id'] })
+            const ret = await itemRepo.first({ orderBy: [{ string_test: 'desc' }, 'id'] })
 
             //then
             assert.strictEqual(ret.length, 1)
             assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
-            assert.deepStrictEqual(spy.orderBy[0], { column: 'string_test', order: 'desc' })
-            assert.deepStrictEqual(spy.orderBy[1], 'id')
+            assert.deepStrictEqual(spy.orderBy[0], { string_test: 'desc' })
+            assert.deepStrictEqual(spy.orderBy[1], { id: 'asc' })
 
         })
 

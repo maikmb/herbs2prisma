@@ -160,12 +160,12 @@ describe('Query Find', () => {
             })
 
             //when
-            const ret = await itemRepo.find({ orderBy: [{ column: 'nome', order: 'desc' }, 'email'] })
+            const ret = await itemRepo.find({ orderBy: [{ nome: 'desc' }, 'email'] })
 
             //then
             assert.strictEqual(ret.length, 2)
             assert.deepStrictEqual(spy.select, { 'id': true, 'string_test': true, 'boolean_test': true })
-            assert.deepStrictEqual(spy.orderBy, [{ column: 'nome', order: 'desc' }, 'email'])
+            assert.deepStrictEqual(spy.orderBy, [{ nome: 'desc' }, { email: 'asc' }])
         })
 
         it('should return error when order by is a empty object', async () => {
