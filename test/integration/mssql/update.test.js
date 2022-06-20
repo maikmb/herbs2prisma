@@ -7,7 +7,7 @@ let pool = {}
 
 describe('Persist Entity', () => {
 
-    const table = 'test_repository'
+    const table = 'Sample'
     const database = 'herbs2knex_testdb'
 
     before(async () => {
@@ -84,7 +84,7 @@ describe('Persist Entity', () => {
                 entity: anEntity,
                 table,
                 database,
-                knex: connection
+                prisma: connection
             })
             const aModifiedInstance = givenAnModifiedEntity()
 

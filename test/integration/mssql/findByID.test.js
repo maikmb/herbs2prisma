@@ -7,7 +7,7 @@ let pool = {}
 
 describe('Query Find by ID', () => {
 
-    const table = 'test_repository'
+    const table = 'Sample'
     const database = 'herbs2knex_testdb'
 
     before(async () => {
@@ -69,7 +69,7 @@ describe('Query Find by ID', () => {
             entity: anEntity,
             table,
             database,
-            knex: connection
+            prisma: connection
         })
         const injection = {}
         await pool.query(`INSERT INTO ${database}..${table} (id, string_test, boolean_test) VALUES (10, 'marie', 1)`)
