@@ -1,5 +1,5 @@
 {
-  "name": "@herbsjs/herbs2prisma",
+  "name": "@maikmb/herbs2prisma",
   "version": "0.0.1",
   "description": "Herbs2prisma is a tool to convert your Herbs schema to a Prisma schema and helps developers integrate with database easily.",
   "main": "./src/herbs2prisma.js",
@@ -21,7 +21,7 @@
     "example": "examples"
   },
   "bugs": {
-    "url": "https://github.com/herbsjs/herbs2prisma/issues/"
+    "url": "https://github.com/maikmb/herbs2prisma/issues/"
   },
   "engines": {
     "node": ">= 14.x"
@@ -35,7 +35,7 @@
   ],
   "author": "Maik Braga",
   "license": "MIT",
-  "homepage": "https://github.com/herbsjs/herbs2prisma#readme",
+  "homepage": "https://github.com/maikmb/herbs2prisma#readme",
   "dependencies": {
     "@herbsjs/herbs": "^1.4.5",
     "@prisma/client": "^3.14.0",
@@ -94,7 +94,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/herbsjs/herbs2prisma.git"
+    "url": "https://github.com/maikmb/herbs2prisma.git"
   },
   "config": {
     "commitizen": {
