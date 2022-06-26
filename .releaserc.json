@@ -1,6 +1,6 @@
 {
   "branches": "master",
-  "repositoryUrl": "https://github.com/herbsjs/herbs2prisma",
+  "repositoryUrl": "https://github.com/maikmb/herbs2prisma",
   "debug": "true",
   "plugins": [
     "@semantic-release/commit-analyzer",

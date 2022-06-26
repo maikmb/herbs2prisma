@@ -1,5 +1,6 @@
-[![CI build](https://github.com/herbsjs/herbs2prisma/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/herbsjs/herbs2prisma/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/herbsjs/herbs2prisma/branch/master/graph/badge.svg)](https://codecov.io/gh/herbsjs/herbs2prisma)
+[![CD Build](https://github.com/maikmb/herbs2prisma/actions/workflows/cd.yml/badge.svg)](https://github.com/maikmb/herbs2prisma/actions/workflows/cd.yml)
+
+<!-- [![codecov](https://codecov.io/gh/herbsjs/herbs2prisma/branch/master/graph/badge.svg)](https://codecov.io/gh/herbsjs/herbs2prisma) -->
 
 # herbs2prisma
 
