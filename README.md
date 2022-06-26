@@ -319,20 +319,21 @@ More about: https://en.wikipedia.org/wiki/Object%E2%80%93relational_impedance_mi
 
 ## TODO
 
+### Features:
+
 - [ ] Be able to generate prisma scheme automatically
 - [ ] Be able to use custom table name
 - [ ] Allow only scalar types for queries (don't allow entity / object types)
 - [ ] Allow to ommit schema's name
 - [ ] Use `findFirst` for `first` method of base repository
-
-Features:
 - [ ] Be able to change the conventions (injection)
 - [ ] Exclude / ignore fields on a sql statement
 - [ ] Awareness of created/updated at/by fields
 - [ ] Plug-and-play prisma
 - [ ] Easy access prisma structure
 
-Retrieving and Persist:
+#### Retrieving and Persist:
+
 - [X] insert
     - [ ] batchs
 - [X] update
@@ -350,7 +351,8 @@ Retrieving and Persist:
 - [X] first
 - [ ] last
 
-Tests:
+#### Tests:
+
 - [X] Pure JS
 - [X] Postgress
 - [ ] Sql Server
