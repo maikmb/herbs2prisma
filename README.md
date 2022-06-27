@@ -16,7 +16,13 @@ herbs2prisma creates repositories to retrieve and store [Entities](https://githu
 Initialize prisma
 
 ```
-    $ npx prisma db pull
+    $ npx prisma db init
+```
+
+Edit `schema.prisma` with your model and generate your client
+
+```
+    $ npx prisma generate
 ```
 
 Configure your connection client with Prisma Client
