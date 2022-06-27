@@ -25,6 +25,18 @@ Edit `schema.prisma` with your model and generate your client
     $ npx prisma generate
 ```
 
+Update your database with your data model
+
+```
+    $ npx prisma db push
+```
+
+After edit your model, you can navigate beetwen data model
+
+```
+    $ npx prisma studio
+```
+
 Configure your connection client with Prisma Client
 
 `connection.js` - Connection:
