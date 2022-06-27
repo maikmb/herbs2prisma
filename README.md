@@ -8,18 +8,34 @@ herbs2prisma creates repositories to retrieve and store [Entities](https://githu
 
 ### Installing
 ```
-    $ npm install @herbsjs/herbs2prisma
+    $ npm install @maikmb/herbs2prisma
 ```
 
 ### Using
 
-`connection.js` - Prisma initialization:
+Initialize prisma
+
+```
+    $ npx prisma db pull
+```
+
+Configure your connection client with Prisma Client
+
+`connection.js` - Connection:
 ```javascript
 const { PrismaClient } = require('@prisma/client')
 
 module.exports = new PrismaClient({
     // log: ['query', 'info'],
 })
+```
+
+Configure your `.env` with your connection string
+
+`.env` - Environment Variables:
+```javascript
+DATABASE_URL="postgresql://postgres:Compasso!2@localhost:5432/herbs2prisma?schema=public"
+
 ```
 
 `itemRepository.js`:
