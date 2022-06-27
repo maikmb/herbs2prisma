@@ -34,7 +34,7 @@ Configure your `.env` with your connection string
 
 `.env` - Environment Variables:
 ```javascript
-DATABASE_URL="postgresql://postgres:Compasso!2@localhost:5432/herbs2prisma?schema=public"
+DATABASE_URL="postgresql://user:password@host:port/database"
 
 ```
 
