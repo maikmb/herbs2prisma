@@ -357,6 +357,7 @@ More about: https://en.wikipedia.org/wiki/Object%E2%80%93relational_impedance_mi
 ### Features:
 
 - [ ] Be able to generate prisma scheme automatically
+- [ ] Be able to get table name automatically
 - [ ] Be able to use custom table name
 - [ ] Allow only scalar types for queries (don't allow entity / object types)
 - [ ] Allow to ommit schema's name
@@ -392,6 +393,10 @@ More about: https://en.wikipedia.org/wiki/Object%E2%80%93relational_impedance_mi
 - [X] Postgress
 - [ ] Sql Server
 - [X] MySQL
+
+### Demo
+
+You can see a demo application [here](https://github.com/maikmb/todolist-on-herbs/tree/feature/herbs2prisma).
 
 ### Contribute
 
