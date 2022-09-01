@@ -39,7 +39,7 @@
   "dependencies": {
     "@herbsjs/herbs": "^1.4.5",
     "@prisma/client": "^3.15.2",
-    "knex": "^2.0.0",
+    "knex": "^2.3.0",
     "prisma": "^3.15.2"
   },
   "devDependencies": {
